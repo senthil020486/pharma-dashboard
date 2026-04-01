@@ -17,20 +17,22 @@ export default function AnalyticsPage() {
     if (isAuthenticated) dispatch(fetchAnalytics({ timeRange }));
   }, [dispatch, isAuthenticated, timeRange]);
 
-  if (!isAuthenticated) return <div className={styles.container}>Please login first</div>;
-  if (loading)          return <div className={styles.container}>Loading analytics...</div>;
-  if (!metrics)         return <div className={styles.container}>No data available</div>;
+  if (!isAuthenticated) return <div className={styles.container} role="alert">Please login first</div>;
+  if (loading)          return <div className={styles.container} role="status" aria-live="polite">Loading analytics...</div>;
+  if (!metrics)         return <div className={styles.container} role="status">No data available</div>;
 
   return (
     <div className={styles.container}>
       <div className={styles.header}>
         <h1>📈 Analytics & Reporting</h1>
-        <div className={styles.timeRangeSelector}>
+        <div className={styles.timeRangeSelector} role="group" aria-label="Select time range for analytics">
           {TIME_RANGES.map((range) => (
             <button
               key={range}
               className={`${styles.timeButton} ${timeRange === range ? styles.active : ''}`}
               onClick={() => dispatch(setTimeRange(range))}
+              aria-pressed={timeRange === range}
+              aria-label={`Show data for ${range.charAt(0).toUpperCase() + range.slice(1)}`}
             >
               {range.charAt(0).toUpperCase() + range.slice(1)}
             </button>
@@ -38,7 +40,7 @@ export default function AnalyticsPage() {
         </div>
       </div>
 
-      <div className={styles.metricsGrid}>
+      <div className={styles.metricsGrid} role="region" aria-label="Key performance metrics" aria-live="polite" aria-atomic="false">
         {[
           { label: 'Total Programs',         value: metrics.totalPrograms },
           { label: 'Active Programs',         value: metrics.activePrograms },
@@ -49,9 +51,20 @@ export default function AnalyticsPage() {
           { label: 'Success Rate',            value: `${metrics.successRate}%` },
           { label: 'Budget Utilization',      value: `${metrics.budgetUtilization}%` },
         ].map(({ label, value, good }) => (
-          <div key={label} className={styles.metricCard}>
+          <div 
+            key={label} 
+            className={styles.metricCard}
+            role="article"
+            aria-label={`${label}: ${value}`}
+          >
             <div className={styles.metricLabel}>{label}</div>
-            <div className={`${styles.metricValue} ${good ? styles.good : ''}`}>{value}</div>
+            <div 
+              className={`${styles.metricValue} ${good ? styles.good : ''}`}
+              role="status"
+              aria-live="polite"
+            >
+              {value}
+            </div>
           </div>
         ))}
       </div>
@@ -61,9 +74,14 @@ export default function AnalyticsPage() {
           { title: 'Development Phase Distribution', data: metrics.phaseDistribution },
           { title: 'Therapeutic Area Distribution',  data: Object.fromEntries(Object.entries(metrics.areaDistribution).slice(0, 8)) },
         ].map(({ title, data }) => (
-          <div key={title} className={styles.chartCard}>
+          <div 
+            key={title} 
+            className={styles.chartCard}
+            role="region"
+            aria-label={title}
+          >
             <h2>{title}</h2>
-            <div className={styles.distributionChart}>
+            <div className={styles.distributionChart} role="img" aria-label={`${title}: ${Object.entries(data).map(([label, count]) => `${label} ${count}`).join(', ')}`}>
               {Object.entries(data)
                 .sort(([, a], [, b]) => (b as number) - (a as number))
                 .map(([label, count]) => (
@@ -73,6 +91,11 @@ export default function AnalyticsPage() {
                       <div
                         className={styles.barFill}
                         style={{ width: `${((count as number) / metrics.totalPrograms) * 100}%` }}
+                        role="progressbar"
+                        aria-valuenow={(count as number)}
+                        aria-valuemin={0}
+                        aria-valuemax={metrics.totalPrograms}
+                        aria-label={`${label}: ${count} out of ${metrics.totalPrograms} programs`}
                       >
                         {count as number}
                       </div>
@@ -84,11 +107,16 @@ export default function AnalyticsPage() {
         ))}
       </div>
 
-      <div className={styles.timeline}>
+      <div className={styles.timeline} role="region" aria-label="Status Timeline">
         <h2>Status Timeline</h2>
         <div className={styles.timelineContent}>
           {metrics.statusTimeline.map((item: any, idx: number) => (
-            <div key={idx} className={styles.timelineItem}>
+            <div 
+              key={idx} 
+              className={styles.timelineItem}
+              role="article"
+              aria-label={`${item.phase}: ${item.count} programs on ${item.date}`}
+            >
               <div className={styles.timelineDate}>{item.date}</div>
               <div className={styles.timelinePhase}>{item.phase}</div>
               <div className={styles.timelineCount}>{item.count} programs</div>

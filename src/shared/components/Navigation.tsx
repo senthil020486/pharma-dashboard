@@ -15,12 +15,6 @@ export default function Navigation() {
       description: 'Overview & Programs'
     },
     {
-      href: '/programs',
-      icon: '💊',
-      label: 'Programs',
-      description: 'Drug Development'
-    },
-    {
       href: '/studies',
       icon: '🔬',
       label: 'Studies',
@@ -47,23 +41,26 @@ export default function Navigation() {
   ];
 
   return (
-    <nav className={styles.navigation} role="navigation" aria-label="Main navigation">
-      {navItems.map((item) => (
-        <Link
-          key={item.href}
-          href={item.href}
-          className={`${styles.navItem} ${pathname === item.href ? styles.active : ''}`}
-          title={item.description}
-          aria-current={pathname === item.href ? 'page' : undefined}
-        >
-          <span className={styles.navIcon} aria-hidden="true">
-            {item.icon}
-          </span>
-          <span className={styles.navLabel}>
-            {item.label}
-          </span>
-        </Link>
-      ))}
+    <nav className={styles.navigation} aria-label="Main navigation menu">
+      <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', gap: '0.5rem', flexWrap: 'nowrap', alignItems: 'center' }}>
+        {navItems.map((item) => (
+          <li key={item.href} style={{ display: 'flex' }}>
+            <Link
+              href={item.href}
+              className={`${styles.navItem} ${pathname === item.href ? styles.active : ''}`}
+              aria-current={pathname === item.href ? 'page' : undefined}
+              aria-label={`${item.label} - ${item.description}`}
+            >
+              <span className={styles.navIcon} aria-hidden="true">
+                {item.icon}
+              </span>
+              <span className={styles.navLabel}>
+                {item.label}
+              </span>
+            </Link>
+          </li>
+        ))}
+      </ul>
     </nav>
   );
 }

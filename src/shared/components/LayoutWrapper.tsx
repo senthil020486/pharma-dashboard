@@ -41,41 +41,46 @@ export default function LayoutWrapper({ children }: LayoutWrapperProps) {
 
   return (
     <div className={styles.dashboard}>
-      <header className={styles.header}>
+      <a href="#main-content" className={styles.skipLink} style={{position: 'absolute', top: '-40px', left: 0, background: '#000', color: '#fff', padding: '8px', zIndex: 1000}} onFocus={(e) => e.currentTarget.style.top = '0'} onBlur={(e) => e.currentTarget.style.top = '-40px'}>
+        Skip to main content
+      </a>
+      
+      <header className={styles.header} role="banner">
         <div className={styles.headerContent}>
-          <div className={styles.logo}>Rx</div>
+          <div className={styles.logo} aria-hidden="true">Rx</div>
           <div className={styles.headerText}>
             <h1>Drug Development Portfolio</h1>
             <p>Clinical RCD Management System</p>
           </div>
         </div>
         <div className={styles.headerRight}>
-          <div className={styles.userInfo}>
+          <div className={styles.userInfo} role="status" aria-live="polite" aria-atomic="false">
             <span className={styles.userName}>{user?.name}</span>
             <span className={`${styles.userRole} ${styles[user?.role || 'viewer']}`}>{user?.role?.toUpperCase()}</span>
           </div>
           <button
             className={styles.themeToggle}
             onClick={handleThemeToggle}
-            aria-label="Toggle Theme"
+            aria-label={`Toggle to ${mode === 'light' ? 'dark' : 'light'} mode`}
             title="Toggle Dark/Light Mode"
           >
-            {mode === 'light' ? '🌙' : '☀️'}
+            <span aria-hidden="true">{mode === 'light' ? '🌙' : '☀️'}</span>
           </button>
           {user?.role === 'admin' && (
             <button
               className={styles.adminButton}
               onClick={() => setShowAdmin(!showAdmin)}
-              aria-label="Admin Panel"
+              aria-label="Toggle Admin Panel"
+              aria-pressed={showAdmin}
               title="Admin Panel"
             >
-              ⚙️
+              <span aria-hidden="true">⚙️</span>
             </button>
           )}
           <button
             className={styles.logoutButton}
             onClick={handleLogout}
-            aria-label="Logout"
+            aria-label="Logout from system"
             title="Logout"
           >
             🚪
@@ -83,9 +88,9 @@ export default function LayoutWrapper({ children }: LayoutWrapperProps) {
         </div>
       </header>
       <Navigation />
-      <div className={styles.layoutContent}>
+      <main className={styles.layoutContent} id="main-content" role="main">
         {children}
-      </div>
+      </main>
     </div>
   );
 }

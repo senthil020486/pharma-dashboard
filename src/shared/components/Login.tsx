@@ -72,14 +72,26 @@ export default function Login() {
   return (
     <div className={styles.container}>
       <div className={styles.loginBox}>
-        <div className={styles.logo}>Rx</div>
+        <div className={styles.logo} aria-hidden="true">Rx</div>
         <h1 className={styles.title}>Drug Development Portfolio</h1>
         <p className={styles.subtitle}>Clinical RCD Management System</p>
 
-        <form onSubmit={handleSubmit} className={styles.form}>
+        <form onSubmit={handleSubmit} className={styles.form} aria-label="User login form" role="form">
+          {error && (
+            <div 
+              className={styles.error} 
+              role="alert" 
+              aria-live="polite" 
+              aria-atomic="true"
+              id="login-error"
+            >
+              {error}
+            </div>
+          )}
+          
           <div className={styles.formGroup}>
             <label htmlFor="email" className={styles.label}>
-              Email
+              Email Address
             </label>
             <input
               type="email"
@@ -90,6 +102,9 @@ export default function Login() {
               required
               className={styles.input}
               disabled={isLoading}
+              aria-required="true"
+              aria-describedby={error ? 'login-error' : undefined}
+              aria-label="Email address input"
             />
           </div>
 
@@ -106,19 +121,25 @@ export default function Login() {
               required
               className={styles.input}
               disabled={isLoading}
+              aria-required="true"
+              aria-describedby={error ? 'login-error' : undefined}
+              aria-label="Password input"
             />
           </div>
 
-          {error && <div className={styles.error}>{error}</div>}
-
-          <button type="submit" className={styles.loginButton} disabled={isLoading}>
+          <button 
+            type="submit" 
+            className={styles.loginButton} 
+            disabled={isLoading}
+            aria-busy={isLoading}
+          >
             {isLoading ? 'Logging in...' : 'Login'}
           </button>
         </form>
 
-        <div className={styles.divider}>Demo Accounts</div>
+        <h2 className={styles.divider}>Demo Accounts</h2>
 
-        <div className={styles.demoAccounts}>
+        <div className={styles.demoAccounts} role="group" aria-label="Demo account options">
           {DEMO_USERS.map((user) => (
             <button
               key={user.email}
@@ -126,17 +147,19 @@ export default function Login() {
               className={`${styles.demoButton} ${styles[user.role]}`}
               onClick={() => quickLogin(user)}
               disabled={isLoading}
+              aria-busy={isLoading}
+              aria-label={`Quick login as ${user.role}: ${user.email}`}
             >
-              <span className={styles.demoRole}>{user.role.toUpperCase()}</span>
+              <span className={styles.demoRole} aria-hidden="true">{user.role.toUpperCase()}</span>
               <span className={styles.demoEmail}>{user.email}</span>
             </button>
           ))}
         </div>
 
-        <div className={styles.info}>
-          <p>📋 <strong>Admin:</strong> Full access to all features</p>
-          <p>✏️ <strong>Editor:</strong> Can edit program metadata</p>
-          <p>👁️ <strong>Viewer:</strong> Read-only access</p>
+        <div className={styles.info} role="region" aria-label="User role descriptions">
+          <p><span aria-hidden="true">📋</span> <strong>Admin:</strong> Full access to all features</p>
+          <p><span aria-hidden="true">✏️</span> <strong>Editor:</strong> Can edit program metadata</p>
+          <p><span aria-hidden="true">👁️</span> <strong>Viewer:</strong> Read-only access</p>
         </div>
       </div>
     </div>

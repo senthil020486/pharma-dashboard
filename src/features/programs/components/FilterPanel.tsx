@@ -62,18 +62,20 @@ export default function FilterPanel({
   };
 
   return (
-    <div className={styles.panel}>
+    <aside className={styles.panel} role="region" aria-label="Filter options for programs">
       <h3 className={styles.title}>Filters</h3>
 
       <fieldset className={styles.fieldset}>
         <legend className={styles.legend}>Development Phase</legend>
-        <div className={styles.checkboxGroup}>
+        <div className={styles.checkboxGroup} role="group" aria-labelledby="phase-legend">
           {DEVELOPMENT_PHASES.map((phase) => (
-            <label key={phase} className={styles.label}>
+            <label key={phase} className={styles.label} htmlFor={`phase-${phase}`}>
               <input
+                id={`phase-${phase}`}
                 type="checkbox"
                 checked={localPhases.includes(phase)}
                 onChange={(e) => handlePhaseChange(phase, e.target.checked)}
+                aria-label={`Filter by development phase: ${phase}`}
               />
               <span>{phase}</span>
             </label>
@@ -83,13 +85,15 @@ export default function FilterPanel({
 
       <fieldset className={styles.fieldset}>
         <legend className={styles.legend}>Therapeutic Area</legend>
-        <div className={styles.checkboxGroup}>
+        <div className={styles.checkboxGroup} role="group" aria-labelledby="area-legend">
           {THERAPEUTIC_AREAS.map((area) => (
-            <label key={area} className={styles.label}>
+            <label key={area} className={styles.label} htmlFor={`area-${area}`}>
               <input
+                id={`area-${area}`}
                 type="checkbox"
                 checked={localAreas.includes(area)}
                 onChange={(e) => handleAreaChange(area, e.target.checked)}
+                aria-label={`Filter by therapeutic area: ${area}`}
               />
               <span>{area}</span>
             </label>
@@ -97,14 +101,22 @@ export default function FilterPanel({
         </div>
       </fieldset>
 
-      <div className={styles.buttonGroup}>
-        <button className={styles.applyButton} onClick={handleApplyFilters}>
+      <div className={styles.buttonGroup} role="group" aria-label="Filter action buttons">
+        <button 
+          className={styles.applyButton} 
+          onClick={handleApplyFilters}
+          aria-label={`Apply filters: ${localPhases.length} phase(s), ${localAreas.length} area(s) selected`}
+        >
           Apply Filters
         </button>
-        <button className={styles.clearButton} onClick={handleClearFilters}>
+        <button 
+          className={styles.clearButton} 
+          onClick={handleClearFilters}
+          aria-label="Clear all selected filters and reset to default view"
+        >
           Clear All
         </button>
       </div>
-    </div>
+    </aside>
   );
 }

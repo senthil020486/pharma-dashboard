@@ -31,13 +31,16 @@ export default function ProgramList({ programs, loading }: ProgramListProps) {
   return (
     <div className={styles.container}>
       <h2 className={styles.title}>Programs</h2>
-      <p className={styles.count}>Total: {programs.length} programs</p>
+      <p className={styles.count} aria-live="polite">Total: {programs.length} programs</p>
 
       {programs.length === 0 ? (
-        <p className={styles.empty}>No programs found</p>
+        <p className={styles.empty} role="status">No programs found</p>
       ) : (
-        <div className={styles.tableWrapper}>
-          <table className={styles.table} role="grid">
+        <div className={styles.tableWrapper} role="region" aria-label="Programs table">
+          <table className={styles.table} role="table" aria-label="List of pharmaceutical programs with their status and details">
+            <caption className={styles.caption} style={{position: 'absolute', left: '-10000px'}}>
+              Table of pharmaceutical programs showing program name, development phase, therapeutic area, milestone, current status, and action buttons for viewing details
+            </caption>
             <thead>
               <tr>
                 <th scope="col">Program Name</th>
@@ -50,22 +53,26 @@ export default function ProgramList({ programs, loading }: ProgramListProps) {
             </thead>
             <tbody>
               {programs.map((program) => (
-                <tr key={program.id}>
-                  <td>{program.name}</td>
-                  <td>{program.developmentPhase}</td>
-                  <td>{program.therapeuticArea}</td>
-                  <td>{program.milestone}</td>
-                  <td>
-                    <span className={`${styles.status} ${styles[program.status.toLowerCase()]}`}>
+                <tr key={program.id} data-program-id={program.id}>
+                  <td headers="program-name"><strong>{program.name}</strong></td>
+                  <td headers="phase">{program.developmentPhase}</td>
+                  <td headers="area">{program.therapeuticArea}</td>
+                  <td headers="milestone">{program.milestone}</td>
+                  <td headers="status">
+                    <span 
+                      className={`${styles.status} ${styles[program.status.toLowerCase()]}`}
+                      role="status"
+                      aria-label={`Status: ${program.status}`}
+                    >
                       {program.status}
                     </span>
                   </td>
-                  <td>
+                  <td headers="action">
                     {canViewDetails ? (
                       <button
                         className={styles.button}
                         onClick={() => handleRowClick(program.id)}
-                        aria-label={`View details for ${program.name}`}
+                        aria-label={`View details for program ${program.name}`}
                       >
                         View Details
                       </button>

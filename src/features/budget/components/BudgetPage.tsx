@@ -50,34 +50,49 @@ export default function BudgetPage() {
     <div className={styles.container}>
       <div className={styles.header}><h1>💰 Budget & Cost Analysis</h1></div>
 
-      <div className={styles.summaryCards}>
+      <div className={styles.summaryCards} role="region" aria-label="Budget summary metrics" aria-live="polite" aria-atomic="false">
         {[
           { label: 'Total Budget Allocated', value: `$${(totalAllocated / 1e6).toFixed(1)}M` },
           { label: 'Total Spent',            value: `$${(totalSpent    / 1e6).toFixed(1)}M` },
           { label: 'Remaining Budget',       value: `$${(totalRemaining/ 1e6).toFixed(1)}M` },
           { label: 'Utilization Rate',       value: `${utilizationRate.toFixed(1)}%`, high: utilizationRate > 80 },
         ].map(({ label, value, high }) => (
-          <div key={label} className={styles.card}>
+          <div 
+            key={label} 
+            className={styles.card}
+            role="article"
+            aria-label={`${label}: ${value}`}
+          >
             <div className={styles.cardLabel}>{label}</div>
-            <div className={`${styles.cardValue} ${high ? styles.high : ''}`}>{value}</div>
+            <div 
+              className={`${styles.cardValue} ${high ? styles.high : ''}`}
+              role="status"
+            >
+              {value}
+            </div>
           </div>
         ))}
       </div>
 
       {loading ? (
-        <div className={styles.loading}>Loading budget data...</div>
+        <div className={styles.loading} role="status" aria-live="polite">Loading budget data...</div>
       ) : (
         <>
           <div className={styles.budgetAnalysis}>
             <h2>Budget Breakdown by Therapeutic Area</h2>
-            <div className={styles.budgetGrid}>
+            <div className={styles.budgetGrid} role="region" aria-label="Budget allocation by therapeutic area">
               {budgetData.map((item) => {
                 const spentPct = (item.spent / item.allocated) * 100;
                 return (
-                  <div key={item.area} className={styles.budgetItem}>
+                  <div 
+                    key={item.area} 
+                    className={styles.budgetItem}
+                    role="article"
+                    aria-label={`${item.area}: ${item.programs} programs, $${(item.allocated / 1e6).toFixed(1)}M allocated, $${(item.spent / 1e6).toFixed(1)}M spent`}
+                  >
                     <div className={styles.budgetHeader}>
                       <div className={styles.budgetArea}>{item.area}</div>
-                      <div className={styles.programCount}>{item.programs} programs</div>
+                      <div className={styles.programCount} aria-label={`${item.programs} programs in this area`}>{item.programs} programs</div>
                     </div>
                     {[
                       { label: 'Allocated:', value: `$${(item.allocated / 1e6).toFixed(1)}M` },
@@ -88,7 +103,14 @@ export default function BudgetPage() {
                         <span className={styles.value}>{value}</span>
                       </div>
                     ))}
-                    <div className={styles.progressBar}>
+                    <div 
+                      className={styles.progressBar}
+                      role="progressbar"
+                      aria-valuenow={Math.round(spentPct)}
+                      aria-valuemin={0}
+                      aria-valuemax={100}
+                      aria-label={`Budget utilization: ${spentPct.toFixed(0)}%`}
+                    >
                       <div className={styles.progressFill} style={{ width: `${Math.min(spentPct, 100)}%` }}>
                         {spentPct.toFixed(0)}%
                       </div>
@@ -105,11 +127,16 @@ export default function BudgetPage() {
 
           <div className={styles.detailedTable}>
             <h2>Program-Level Budget Details</h2>
-            <div className={styles.tableContainer}>
-              <table className={styles.table}>
+            <div className={styles.tableContainer} role="region" aria-label="Detailed budget information for individual programs">
+              <table className={styles.table} role="table" aria-label="Program-level budget details with allocation and utilization">
+                <caption style={{position: 'absolute', left: '-10000px'}}>
+                  Detailed table showing budget allocation, estimated spending, and utilization rate for each program
+                </caption>
                 <thead>
                   <tr>
-                    {['Program ID','Program Name','Therapeutic Area','Phase','Budget Allocated','Est. Spent','Remaining','Utilization'].map(h => <th key={h}>{h}</th>)}
+                    {['Program ID','Program Name','Therapeutic Area','Phase','Budget Allocated','Est. Spent','Remaining','Utilization'].map(h => (
+                      <th key={h} scope="col">{h}</th>
+                    ))}
                   </tr>
                 </thead>
                 <tbody>
@@ -118,16 +145,23 @@ export default function BudgetPage() {
                     const spent       = Math.floor(allocated * (p.successRate ?? 50) / 100);
                     const utilization = allocated > 0 ? (spent / allocated) * 100 : 0;
                     return (
-                      <tr key={p.id}>
-                        <td className={styles.programId}>{p.id}</td>
-                        <td>{p.name}</td>
-                        <td>{p.therapeuticArea}</td>
-                        <td>{p.developmentPhase}</td>
-                        <td>${(allocated / 1e6).toFixed(2)}M</td>
-                        <td>${(spent     / 1e6).toFixed(2)}M</td>
-                        <td>${((allocated - spent) / 1e6).toFixed(2)}M</td>
-                        <td>
-                          <div className={styles.miniProgress}>
+                      <tr key={p.id} role="row">
+                        <td className={styles.programId} role="cell">{p.id}</td>
+                        <td role="cell"><strong>{p.name}</strong></td>
+                        <td role="cell">{p.therapeuticArea}</td>
+                        <td role="cell">{p.developmentPhase}</td>
+                        <td role="cell">${(allocated / 1e6).toFixed(2)}M</td>
+                        <td role="cell">${(spent     / 1e6).toFixed(2)}M</td>
+                        <td role="cell">${((allocated - spent) / 1e6).toFixed(2)}M</td>
+                        <td role="cell">
+                          <div 
+                            className={styles.miniProgress}
+                            role="progressbar"
+                            aria-valuenow={Math.round(utilization)}
+                            aria-valuemin={0}
+                            aria-valuemax={100}
+                            aria-label={`Budget utilization: ${utilization.toFixed(0)}%`}
+                          >
                             <div className={styles.miniFill} style={{ width: `${utilization}%` }} />
                           </div>
                           {utilization.toFixed(0)}%

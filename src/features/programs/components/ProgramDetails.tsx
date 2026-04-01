@@ -91,23 +91,35 @@ export default function ProgramDetails({ program }: ProgramDetailsProps) {
 
   return (
     <div className={styles.container}>
-      <button className={styles.backButton} onClick={handleBackClick} aria-label="Go back to program list">
+      <button 
+        className={styles.backButton} 
+        onClick={handleBackClick} 
+        aria-label="Go back to program list"
+      >
         ← Back to List
       </button>
 
       <div className={styles.header}>
         <div>
           <h1 className={styles.title}>{program.name}</h1>
-          <p className={styles.id}>ID: {program.id}</p>
+          <p className={styles.id} aria-label={`Program ID: ${program.id}`}>ID: {program.id}</p>
         </div>
-        <div className={styles.headerButtons}>
+        <div className={styles.headerButtons} role="group" aria-label="Program action buttons">
           {canDelete && !isEditing && (
-            <button className={styles.deleteButton} onClick={handleDelete}>
-              🗑️ Delete Program
+            <button 
+              className={styles.deleteButton} 
+              onClick={handleDelete}
+              aria-label={`Delete program ${program.name}`}
+            >
+              <span aria-hidden="true">🗑️</span> Delete Program
             </button>
           )}
           {canEdit && !isEditing && (
-            <button className={styles.editButton} onClick={handleEdit}>
+            <button 
+              className={styles.editButton} 
+              onClick={handleEdit}
+              aria-label={`Edit metadata for ${program.name}`}
+            >
               Edit Metadata
             </button>
           )}
@@ -115,55 +127,74 @@ export default function ProgramDetails({ program }: ProgramDetailsProps) {
       </div>
 
       <div className={styles.grid}>
-        <div className={styles.card}>
+        <div className={styles.card} role="region" aria-label="Program information">
           <h3>Program Information</h3>
           <div className={styles.infoGroup}>
-            <label>Development Phase</label>
+            <label htmlFor="phase-input" aria-required={isEditing}>Development Phase</label>
             {isEditing ? (
               <input
+                id="phase-input"
                 type="text"
                 value={editedProgram.developmentPhase || ''}
                 onChange={(e) => handleInputChange('developmentPhase', e.target.value)}
+                aria-label="Edit development phase"
+                aria-required="true"
               />
             ) : (
-              <p className={styles.phaseInfo}>{program.developmentPhase}</p>
+              <p className={styles.phaseInfo} role="status">{program.developmentPhase}</p>
             )}
           </div>
 
           <div className={styles.infoGroup}>
-            <label>Therapeutic Area</label>
+            <label htmlFor="area-input" aria-required={isEditing}>Therapeutic Area</label>
             {isEditing ? (
               <input
+                id="area-input"
                 type="text"
                 value={editedProgram.therapeuticArea || ''}
                 onChange={(e) => handleInputChange('therapeuticArea', e.target.value)}
+                aria-label="Edit therapeutic area"
+                aria-required="true"
               />
             ) : (
-              <p>{program.therapeuticArea}</p>
+              <p role="status">{program.therapeuticArea}</p>
             )}
           </div>
 
           <div className={styles.infoGroup}>
             <label>Target Indication</label>
-            <p>{program.targetIndication}</p>
+            <p role="status">{program.targetIndication}</p>
           </div>
 
           <div className={styles.infoGroup}>
             <label>Status</label>
-            <p className={styles[program.status.toLowerCase()]}>{program.status}</p>
+            <p 
+              className={styles[program.status.toLowerCase()]}
+              role="status"
+              aria-label={`Program status: ${program.status}`}
+            >
+              {program.status}
+            </p>
           </div>
         </div>
 
-        <div className={styles.card}>
+        <div className={styles.card} role="region" aria-label="Development timeline and progress">
           <h3>Development Timeline</h3>
           <div className={styles.timelineContainer}>
-            <div className={styles.timelineTrack}>
+            <div 
+              className={styles.timelineTrack}
+              role="progressbar"
+              aria-valuenow={Math.round(completionPercentage)}
+              aria-valuemin={0}
+              aria-valuemax={100}
+              aria-label={`Program progress: ${Math.round(completionPercentage)}%`}
+            >
               <div 
                 className={styles.timelineProgress}
                 style={{ width: `${completionPercentage}%` }}
               />
             </div>
-            <div className={styles.timelinePhases}>
+            <div className={styles.timelinePhases} role="list" aria-label="Development phase timeline">
               {PHASE_TIMELINE.map((phase, index) => (
                 <div 
                   key={phase}
@@ -172,14 +203,21 @@ export default function ProgramDetails({ program }: ProgramDetailsProps) {
                     index < currentPhaseIndex ? styles.completed :
                     styles.pending
                   }`}
+                  role="listitem"
+                  aria-current={index === currentPhaseIndex ? 'step' : undefined}
+                  aria-label={`${phase} - ${
+                    index < currentPhaseIndex ? 'completed' :
+                    index === currentPhaseIndex ? 'current phase' :
+                    'pending'
+                  }`}
                   title={phase}
                 >
-                  <div className={styles.phaseDot} />
+                  <div className={styles.phaseDot} aria-hidden="true" />
                   <div className={styles.phaseLabel}>{phase}</div>
                 </div>
               ))}
             </div>
-            <div className={styles.timelineStats}>
+            <div className={styles.timelineStats} role="status" aria-live="polite">
               <div className={styles.statItem}>
                 <span className={styles.statLabel}>Progress</span>
                 <span className={styles.statValue}>{Math.round(completionPercentage)}%</span>
@@ -193,10 +231,10 @@ export default function ProgramDetails({ program }: ProgramDetailsProps) {
         </div>
       </div>
 
-      <div className={styles.card}>
+      <div className={styles.card} role="region" aria-label="Associated studies and enrollment information">
         <h3>Associated Studies & Enrollment</h3>
         {studies.length === 0 ? (
-          <p className={styles.empty}>No studies associated with this program</p>
+          <p className={styles.empty} role="status">No studies associated with this program</p>
         ) : (
           <div className={styles.studiesContainer}>
             <div className={styles.studiesSummary}>

@@ -36,6 +36,13 @@ const authSlice = createSlice({
       state.isAuthenticated = true;
       state.user = action.payload;
       state.error = null;
+      // Persist to localStorage
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('auth', JSON.stringify({
+          isAuthenticated: true,
+          user: action.payload,
+        }));
+      }
     },
     loginError: (state, action: PayloadAction<string>) => {
       state.loading = false;
@@ -45,13 +52,32 @@ const authSlice = createSlice({
       state.isAuthenticated = false;
       state.user = null;
       state.error = null;
+      // Clear localStorage
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem('auth');
+      }
     },
     setUser: (state, action: PayloadAction<User | null>) => {
       state.user = action.payload;
       state.isAuthenticated = !!action.payload;
+      // Persist to localStorage
+      if (typeof window !== 'undefined') {
+        if (action.payload) {
+          localStorage.setItem('auth', JSON.stringify({
+            isAuthenticated: true,
+            user: action.payload,
+          }));
+        } else {
+          localStorage.removeItem('auth');
+        }
+      }
+    },
+    restoreAuth: (state, action: PayloadAction<{ isAuthenticated: boolean; user: User | null }>) => {
+      state.isAuthenticated = action.payload.isAuthenticated;
+      state.user = action.payload.user;
     },
   },
 });
 
-export const { loginStart, loginSuccess, loginError, logout, setUser } = authSlice.actions;
+export const { loginStart, loginSuccess, loginError, logout, setUser, restoreAuth } = authSlice.actions;
 export default authSlice.reducer;
